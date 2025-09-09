@@ -1,0 +1,91 @@
+name: CI (React + Laravel + Cypress)
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: test_db
+          MYSQL_USER: laravel
+          MYSQL_PASSWORD: secret
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    steps:
+
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, pdo, pdo_mysql, bcmath
+          coverage: none
+
+      - name: Install Laravel dependencies
+        run: |
+          cd backend
+          composer install --no-interaction --prefer-dist
+
+      - name: Install React dependencies
+        run: |
+          cd frontend
+          npm ci
+
+      - name: Copy env files
+        run: |
+          cp frontend/.env.ci frontend/.env
+          cp backend/.env.ci backend/.env
+
+      - name: Wait for MySQL
+        run: sleep 15
+
+      - name: Import DB dump
+        run: |
+          mysql -h 127.0.0.1 -u laravel -psecret test_db < backend/database/dumps/dump.sql
+
+      - name: Prepare Laravel
+        run: |
+          cd backend
+          php artisan key:generate
+          php artisan migrate --force
+
+      - name: Build React
+        run: |
+          cd frontend
+          npm run build
+
+      - name: Start servers
+        run: |
+          cd backend && php artisan serve --host=127.0.0.1 --port=8000 &
+          cd frontend && npx serve -s build -l 5173 &
+        shell: bash
+
+      - name: Wait for services
+        run: sleep 15
+
+      - name: Run Cypress tests
+        uses: cypress-io/github-action@v6
+        with:
+          browser: chrome
+          headless: true
+          wait-on: 'http://127.0.0.1:5173'
+          wait-on-timeout: 60
