@@ -39,6 +39,13 @@ jobs:
           php-version: '8.2'
           extensions: mbstring, pdo, pdo_mysql, bcmath
           coverage: none
+      
+
+      - name: Debug
+        run: |
+          pwd
+          ls -la
+          ls -la backend || true
 
       - name: Install Laravel dependencies
         run: |
