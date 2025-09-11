@@ -25,15 +25,17 @@ jobs:
           --health-interval=10s
           --health-timeout=5s
           --health-retries=3
-      
+    
     steps:
 
       - uses: actions/checkout@v4
+
 
       - uses: actions/setup-node@v4
         with:
           node-version: 18
       
+
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -41,16 +43,34 @@ jobs:
           extensions: mbstring, pdo, pdo_mysql, bcmath
           coverage: none
       
-      - name: Debug
+      - name: Debug folders
         run: |
           pwd
           ls -la
           ls -la backend || true
+          ls -la frontend || true
+
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v3
+        with:
+          path: backend/vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('backend/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
 
       - name: Install Laravel dependencies
         run: |
           cd backend
           composer install --no-progress --prefer-dist --optimize-autoloader
+
+      - name: Cache NPM dependencies
+        uses: actions/cache@v3
+        with:
+          path: frontend/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('frontend/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
 
       - name: Install React dependencies
         run: |
@@ -73,6 +93,7 @@ jobs:
             sleep 2
           done
 
+ 
       - name: Import DB dump
         run: |
           mysql -h 127.0.0.1 -u test_user -ptest_pass test_db < backend/database/dumps/dump.sql
@@ -91,10 +112,12 @@ jobs:
           DB_USERNAME: test_user
           DB_PASSWORD: test_pass
 
+
       - name: Build React
         run: |
           cd frontend
           npm run build
+
 
       - name: Start servers
         run: |
@@ -109,6 +132,8 @@ jobs:
         uses: cypress-io/github-action@v6
         with:
           browser: chrome
-          headless: true
           wait-on: 'http://127.0.0.1:5173'
           wait-on-timeout: 60
+          command: npx cypress run --record --key ${{ secrets.CYPRESS_RECORD_KEY }} --group "CI Tests"
+          working-directory: frontend
+          publish-summary: true
