@@ -132,7 +132,7 @@ jobs:
         shell: bash
 
       - name: Wait for frontend
-        uses: jakejarvis/wait-action@v0.1.4
+        uses: jakejarvis/wait-action@v0.1.1
         with:
           url: http://127.0.0.1:5173
           timeout: 120
