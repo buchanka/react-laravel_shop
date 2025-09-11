@@ -128,16 +128,12 @@ jobs:
       - name: Start React server
         run: |
           cd frontend
-          npx serve -s build -l 0.0.0.0:5173 &
+          npx serve -s build -l 5173 -n &
           echo "React started in background"
         shell: bash
 
-      - name: Wait for React build
-        uses: jakejarvis/wait-action@v0.1.1
-        with:
-          entryPoint: curl
-          args: -f http://127.0.0.1:5173
-          time: 120s
+      - name: Wait for React
+        run: npx wait-on http://127.0.0.1:5173
 
       - name: Run Cypress tests
         uses: cypress-io/github-action@v6
