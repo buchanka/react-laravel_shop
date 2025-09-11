@@ -26,7 +26,8 @@ jobs:
           --health-timeout=5s
           --health-retries=3
           --default-authentication-plugin=mysql_native_password
-      command: --default-authentication-plugin=mysql_native_password
+      command: >
+          --default-authentication-plugin=mysql_native_password
     
     steps:
 
@@ -43,7 +44,6 @@ jobs:
           extensions: mbstring, pdo, pdo_mysql, bcmath
           coverage: none
       
-
       - name: Debug
         run: |
           pwd
@@ -78,7 +78,7 @@ jobs:
 
       - name: Import DB dump
         run: |
-          mysql -h 127.0.0.1 -u laravel -psecret test_db < backend/database/dumps/dump.sql
+          mysql -h 127.0.0.1 -u test_user -ptest_pass test_db < backend/database/dumps/dump.sql
 
       - name: Prepare Laravel
         run: |
