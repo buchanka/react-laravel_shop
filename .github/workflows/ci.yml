@@ -119,21 +119,28 @@ jobs:
           npm run build
 
 
-      - name: Start servers
+      - name: Start Laravel server
         run: |
-          cd backend && php artisan serve --host=127.0.0.1 --port=8000 &
-          cd frontend && npx serve -s build -l 5173 &
+          cd backend
+          php artisan serve --host=127.0.0.1 --port=8000 &
         shell: bash
 
-      - name: Wait for services
-        run: sleep 15
+      - name: Start React server
+        run: |
+          cd frontend
+          npx serve -s build -l 5173 &
+        shell: bash
+
+      - name: Wait for frontend
+        uses: jakejarvis/wait-action@v0.1.4
+        with:
+          url: http://127.0.0.1:5173
+          timeout: 120
 
       - name: Run Cypress tests
         uses: cypress-io/github-action@v6
         with:
           browser: chrome
-          wait-on: 'http://127.0.0.1:5173'
-          wait-on-timeout: 60
           command: npx cypress run --record --key ${{ secrets.CYPRESS_RECORD_KEY }} --group "CI Tests"
           working-directory: frontend
           publish-summary: true
