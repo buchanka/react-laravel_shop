@@ -1,0 +1,68 @@
+.mySwiper .swiper-button-next,
+.mySwiper .swiper-button-prev{
+    color: rgb(29, 41, 55);  
+}
+
+.mySwiper .swiper-slide{
+  max-width: auto;
+}
+
+.mySwiper {
+  max-width: 1300px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.mySwiper.arrow-white .swiper-button-next,
+.mySwiper.arrow-white .swiper-button-prev{
+    color:rgb(208, 198, 203);
+    font-size: 100px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    
+}
+
+.mySwiper:hover.arrow-white .swiper-button-next,
+.mySwiper:hover.arrow-white .swiper-button-prev{
+    opacity: 1;
+}
+
+
+.mySwiper .swiper-button-next,
+.mySwiper .swiper-button-prev {
+  position: absolute; 
+  top: 50%; 
+  transform: translateY(-40%); 
+  z-index: 10; 
+  width: auto;
+  height: auto;
+  border-radius: 50%;
+
+}
+
+
+.mySwiper .swiper-button-next::after,
+.mySwiper .swiper-button-prev::after{
+  font-size: 50px;
+  
+}
+
+.swiper-slide-fade-out .absolute > div, 
+.swiper-slide-fade-in .absolute > div { 
+  transition: opacity 0.3s ease;
+}
+
+.swiper-slide-fade-out .absolute > div {
+  opacity: 0;
+}
+
+
+
+
+
+
+
+
+
+
+

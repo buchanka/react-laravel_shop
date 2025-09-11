@@ -1,0 +1,15 @@
+AddDefaultCharset UTF-8
+Options -MultiViews
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^ index.html [QSA,L]
+
+<FilesMatch "\.(html|htm|js|css|png|jpg|gif|svg)$">
+  FileETag None
+  <IfModule mod_headers.c>
+    Header unset ETag
+    Header set Cache-Control "max-age=0, private, no-cache, no-store, must-revalidate"
+    Header set Pragma "no-cache"
+    Header set Expires "0"
+  </IfModule>
+</FilesMatch>
