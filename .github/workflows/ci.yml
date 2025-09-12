@@ -125,20 +125,20 @@ jobs:
           php artisan serve --host=127.0.0.1 --port=8000 &
         shell: bash
 
-      - name: Start React server
+      - name: Debug processes and ports
         run: |
-          cd frontend
-          npx serve -s build -l 5173 -n &
-          echo "React started in background"
+          ps aux | grep -E "artisan|serve" || true
+          ss -tulpn | grep 5173 || true
+          ss -tulpn | grep 8000 || true
         shell: bash
 
-      - name: Wait for React
-        run: npx wait-on http://127.0.0.1:5173
-
-      - name: Run Cypress tests
+      - name: Run Cypress tests (start frontend, wait, run)
         uses: cypress-io/github-action@v6
         with:
-          browser: chrome
-          command: npx cypress run --record --key ${{ secrets.CYPRESS_RECORD_KEY }} --group "CI Tests"
           working-directory: frontend
+          start: npx serve -s build -l 127.0.0.1:5173
+          wait-on: 'http://127.0.0.1:5173'
+          wait-on-timeout: 120
+          command: npx cypress run --record --key ${{ secrets.CYPRESS_RECORD_KEY }} --group "CI Tests"
           publish-summary: true
+          browser: chrome
