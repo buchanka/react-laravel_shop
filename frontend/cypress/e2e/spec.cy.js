@@ -1,5 +1,5 @@
-describe('template spec', () => {
-  it('passes', () => {
+describe('first test', () => {
+  it('visits my app', () => {
     cy.visit('/')
   })
 })
