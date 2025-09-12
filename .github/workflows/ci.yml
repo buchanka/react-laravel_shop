@@ -27,14 +27,11 @@ jobs:
           --health-retries=3
     
     steps:
-
       - uses: actions/checkout@v4
-
 
       - uses: actions/setup-node@v4
         with:
           node-version: 18
-      
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -49,7 +46,6 @@ jobs:
           ls -la
           ls -la backend || true
           ls -la frontend || true
-
 
       - name: Cache Composer dependencies
         uses: actions/cache@v3
@@ -93,7 +89,6 @@ jobs:
             sleep 2
           done
 
- 
       - name: Import DB dump
         run: |
           mysql -h 127.0.0.1 -u test_user -ptest_pass test_db < backend/database/dumps/dump.sql
@@ -112,12 +107,10 @@ jobs:
           DB_USERNAME: test_user
           DB_PASSWORD: test_pass
 
-
       - name: Build React
         run: |
           cd frontend
           npm run build
-
 
       - name: Start Laravel server
         run: |
@@ -130,7 +123,7 @@ jobs:
           ps aux | grep -E "artisan|serve" || true
           ss -tulpn | grep 5173 || true
           ss -tulpn | grep 8000 || true
-          curl -I http://127.0.0.1:5173 || true
+          ls -la frontend/dist || true
         shell: bash
 
       - name: Run Cypress tests (start frontend, wait, run)
@@ -143,3 +136,4 @@ jobs:
           command: npx cypress run --record --key ${{ secrets.CYPRESS_RECORD_KEY }} --group "CI Tests"
           publish-summary: true
           browser: chrome
+
